@@ -1,4 +1,7 @@
 <?php
+
+
+
 /* Licensed under the Apache License, Version 2.0
  * See the LICENSE and NOTICE file for further information
  */
@@ -17,6 +20,10 @@
  */
 function autoload($class) {
     $incFile = str_replace("_", DIRECTORY_SEPARATOR, $class).".php";
+    // using namespaces
+    //echo "<pre>";
+//    $incFile = str_replace('\\', '/', $class) . '.php';
+    //echo $incFile;
     //$incFile = strToLower( $incFile );
     /*
     * Well, we could prevent a fatal error with checking if the file exists..
@@ -33,7 +40,7 @@ function autoload($class) {
     // Logg included file
 
     if (@fopen($incFile, "r", TRUE)) {
-        include($incFile);
+        include_once($incFile);
 
         return $incFile;
     }

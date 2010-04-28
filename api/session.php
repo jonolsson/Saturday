@@ -1,4 +1,5 @@
 <?php
+
 class api_session {
     private static $instance;
 
