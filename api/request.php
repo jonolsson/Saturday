@@ -1,5 +1,4 @@
 <?php
-
 /* Licensed under the Apache License, Version 2.0
  * See the LICENSE and NOTICE file for further information
  */
@@ -37,7 +36,7 @@ class api_request {
      * @param $forceReload bool: If true, forces instantiation of a
      *        new instance. Used for testing.
      */
-    /*public static function getInstance($forceReload = false) {
+    public static function getInstance($forceReload = false) {
         static $instance;
 
         if  ($forceReload || !isset($instance) || !($instance instanceof api_request)) {
@@ -45,18 +44,18 @@ class api_request {
         }
 
         return $instance;
-    }*/
+    }
 
     /**
      * Constructor. Parses the request and fills in all the
      * values it can.
      */
-    public function __construct($lang = null, $extensions = null) {
+    protected function __construct() {
         $this->host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 
-        //$config = api_config::getInstance();
-        $this->outputLangs = empty($lang['languages']) ? array('en') : $lang['languages'];
-        $this->defaultLang = empty($lang['default']) ? reset($this->outputLangs) : $lang['default'];
+        $config = api_config::getInstance();
+        $this->outputLangs = $config->lang['languages'];
+        $this->defaultLang = $config->lang['default'];
         if (is_null($this->outputLangs)) {
             $this->outputLangs = array('en');
         }
@@ -65,11 +64,11 @@ class api_request {
         }
 
         // Parse host, get SLD / TLDww.tv.nu/
-        /*$hostinfo = api_init::getHostConfig($this->host);
+        $hostinfo = api_init::getHostConfig($this->host);
         if ($hostinfo) {
             $this->sld = $hostinfo['sld'];
             $this->tld = $hostinfo['tld'];
-        }*/
+        }
 
         $path = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '';
         //$path = isset($_REQUEST['p']) ? $_GET['p'] : '';

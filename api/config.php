@@ -1,5 +1,4 @@
 <?php
-
 /* Licensed under the Apache License, Version 2.0
  * See the LICENSE and NOTICE file for further information
  */
@@ -99,44 +98,13 @@ class api_config {
      * Constructor. Loads the configuration file into memory.
      */
     protected function __construct() {
-        if (isset($_SERVER['SATURDAY_ENV'])) {
-            $this->env = $_SERVER['SATURDAY_ENV'];
+        if (isset($_SERVER['IBIS_ENV'])) {
+            $this->env = $_SERVER['IBIS_ENV'];
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
-/*// Load Config
-        $cachefile = self::getCacheFilename('bootstrap', $env);
-        if (file_exists($cachefile)) {
-           $cfg = unserialize(file_get_contents($cachefile));
-            if ($cfg['configCache'] === 'auto'
-                && $cfg['cachetime'] < filemtime(PROJECT_DIR . 'conf/bootstrap.yml')
-            ) {
-                unset($cfg);
-            }
-        }
-        if (empty($cfg)) {
-            require_once PROJECT_DIR . 'vendor/sfYaml/sfYaml.class.php';
-            $cfg = sfYaml::load(PROJECT_DIR . 'config/bootstrap.yml');
-            $cfg = $cfg[$env];
-            if (!empty($cfg['configCache'])) {
-                $cfg['cachetime'] = $_SERVER['REQUEST_TIME'];
-                file_put_contents($cachefile, serialize($cfg));
-            }
-        }
-
-        if (empty($cfg)) {
-            require_once PROJECT_DIR.'/vendor/sfYaml/sfYaml.class.php';
-            $cfg = sfYaml::load(PROJECT_DIR . 'conf/bootstrap.yml');
-            $cfg = isset($cfg[$env]) ? $cfg[$env] : $cfg['default'];
-            if (!empty($cfg['configCache'])) {
-                $cfg['cachetime'] = $_SERVER['REQUEST_TIME'];
-                file_put_contents($cachefile, serialize($cfg));
-            }
-        }
-        print_r($cfg);
 
         $this->load();
-*/
     }
 
     public function load($command = false) {
@@ -349,21 +317,4 @@ class api_config {
 
         return $value;
     }
-
-
-
-    /**
-     * Returns the filename of the configuration cache file to be used.
-     */
-   /* public static function getCacheFilename($name, $env) {
-        if (!is_writable(API_TEMP_DIR)) {
-            return null;
-        }
-
-        $file = API_TEMP_DIR . $name. '-cache_' . $env;
-
-        return $file . '.php';
-    }
-
-    */
 }

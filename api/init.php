@@ -1,41 +1,29 @@
 <?php
 
 class api_init {
-    protected static $initialized = false;
-    protected static $cfg;
+    private static $initialized = false;
 
     public static function start() {
         if (self::$initialized) {
-            return self::$cfg;
+            return;
         }
         
         /* project root
            ********************/
         define( 'PROJECT_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
         define( 'API_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
-        define( 'VENDOR_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'vendor'.DIRECTORY_SEPARATOR);
         define( 'APP_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'app');
-        define( 'SYMFONY_DIR', VENDOR_DIR.'sfEvent'.DIRECTORY_SEPARATOR);
-        define( 'SYMFONY_REQUEST_HANDLER_DIR', VENDOR_DIR.'sfRequestHandler'.DIRECTORY_SEPARATOR);
 
         $root = dirname(dirname(__FILE__));
         set_include_path( 
             API_DIR . PATH_SEPARATOR .
-            VENDOR_DIR . PATH_SEPARATOR .
-            SYMFONY_DIR . PATH_SEPARATOR .
-            SYMFONY_REQUEST_HANDLER_DIR . PATH_SEPARATOR .
             APP_DIR . PATH_SEPARATOR .
             get_include_path()
         );
+        include 'autoload.php';
 
-require_once VENDOR_DIR . 'sfYaml/sfYaml.class.php';
-        // Create temporary directory
-        define('API_TEMP_DIR', PROJECT_DIR.'tmp/');
-        if (!is_dir(API_TEMP_DIR)) {
-            mkdir(API_TEMP_DIR, 0777, true);
-        }
-
-
+        // Start sessions
+        $sessions = api_session::getInstance();
         
         // Construct URL for Web home (root of current host)
         $hostname = (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
@@ -55,7 +43,7 @@ require_once VENDOR_DIR . 'sfYaml/sfYaml.class.php';
         define('API_MOUNTPATH', $hostinfo['path']);
 
 
-//        require_once(PROJECT_DIR."config/commandmap.php");
+        require_once(PROJECT_DIR."config/commandmap.php");
 
         if (!function_exists('e')) {
             /**
@@ -114,8 +102,6 @@ if (!function_exists('url')) {
 
 
         self::$initialized = true;
-        //self::$cfg = $cfg;
-        //return $cfg;
     }
 
     /**
@@ -209,19 +195,4 @@ if (!function_exists('url')) {
                      'path' => $path);
     }
 
-    
-    /**
-     * Returns the filename of the configuration cache file to be used.
-     */
-   /* public static function getCacheFilename($name, $env) {
-        if (!is_writable(API_TEMP_DIR)) {
-            return null;
-        }
-
-        $file = API_TEMP_DIR . $name. '-cache_' . $env;
-
-        return $file . '.php';
-    }
-
-    */
 }
