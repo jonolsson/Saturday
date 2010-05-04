@@ -96,11 +96,11 @@ class api_push_hub {
       $this->subscriptions->save($post['hub_topic'], $post['hub_callback'], isset($post['secret']) ? $post['secret'] : '');
     //  header('HTTP/1.1 204 "No Content"', null, 204);
     //    exit(); */
-    //    echo "Good";
+      echo "Good";
       return true;
     }
-    return false;
     echo "not found";
+    return false;
     //header('HTTP/1.1 404 "Not Found"', null, 404);
     //exit(); */
   }

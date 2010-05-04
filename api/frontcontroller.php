@@ -86,7 +86,7 @@ class api_frontcontroller {
 
         $params = new api_params($this->route);
         $this->action = $this->route['action'];
-        $this->controller = new $ctrl($params, $this->request);
+        $this->controller = new $ctrl($params, $this->request, $this->response);
     }
 
     private function processController() {

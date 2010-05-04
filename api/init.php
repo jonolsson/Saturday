@@ -13,11 +13,13 @@ class api_init {
         define( 'PROJECT_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
         define( 'API_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
         define( 'APP_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'app');
+        define( 'LOCAL_API_DIR', PROJECT_DIR.'localinc'.DIRECTORY_SEPARATOR);
 
         $root = dirname(dirname(__FILE__));
         set_include_path( 
             API_DIR . PATH_SEPARATOR .
             APP_DIR . PATH_SEPARATOR .
+            LOCAL_API_DIR . PATH_SEPARATOR .
             get_include_path()
         );
         include 'autoload.php';

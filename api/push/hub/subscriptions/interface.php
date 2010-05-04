@@ -36,7 +36,7 @@ interface api_push_hub_subscriptions_interface {
    *   The subscriber URL that is the callback to be invoked when the topic
    *   changes.
    */
-  public function delete($topic, $subscriber);
+  public function delete($topic, $callback);
 
   /**
    * Find all subscriber URLs for a given topic URL.

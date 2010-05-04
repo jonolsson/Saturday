@@ -9,9 +9,12 @@ class api_controller {
 
     protected $route = null;
 
-    function __construct($route, $request) {
+    protected $response = null;
+
+    function __construct($route, $request, $response) {
         $this->params = $route;
         $this->request = $request;
+        $this->response = $response;
     }
 
     function setView($view) {
