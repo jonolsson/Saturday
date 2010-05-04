@@ -28,7 +28,7 @@ class api_openid_rely {
     }
 
     function begin($claimed_id, $return_to, $values) {
-        $claimed_id = $this->normalize($claimed_id);
+        // one is enough $claimed_id = $this->normalize($claimed_id);
 
         $claimed_id = $this->normalize($claimed_id);
 
@@ -39,76 +39,75 @@ class api_openid_rely {
         }
 
         echo "Store in session\r\n";
-    // Store discovered information in Session
-    $_SESSION['openid']['service'] = $services[0];
-    $_SESSION['openid']['claimed_id'] = $claimed_id;
-    $_SESSION['openid']['user_login_values'] = $values;
+        // Store discovered information in Session
+        $_SESSION['openid']['service'] = $services[0];
+        $_SESSION['openid']['claimed_id'] = $claimed_id;
+        $_SESSION['openid']['user_login_values'] = $values;
 
-    $openid_endpoint = $services[0]['uri'];
-    $assoc_handle = $this->association($openid_endpoint);
+        $openid_endpoint = $services[0]['uri'];
+        $assoc_handle = $this->association($openid_endpoint);
 
-    // Time to acctualy request authentication
-    // First LocalID, Delegate othervise fallback on $claimed_id.
-    if (!empty($services[0]['localid'])) {
-        $identity = $services[0]['localid'];
-    } else if (!empty($services[0]['delegate'])) {
-        $identity = $services[0]['delegate'];
-    } else {
-        $identity = $claimed_id;
-    }
+        // Time to acctualy request authentication
+        // First LocalID, Delegate othervise fallback on $claimed_id.
+        if (!empty($services[0]['localid'])) {
+            $identity = $services[0]['localid'];
+        } else if (!empty($services[0]['delegate'])) {
+            $identity = $services[0]['delegate'];
+        } else {
+            $identity = $claimed_id;
+        }
 
-    if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
-        $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
-    }
-    $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
+        if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
+            $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
+        }
+        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
 
         if ($services[0]['version'] == 2) {
-   //     openid_redirect($openid_endpoint, $authn_request);
-        echo "Redirect: $openid_endpoint";
-        $this->redirect_http($openid_endpoint, $authn_request);
-    } else {
-   //     openid_redirect_http($openid_endpoint, $authn_request);
-        echo "Redirect: $openid_endpoint";
-    }
-$services = openid_descovery($claimed_id);
-    if (count($services) == 0) {
-        echo 'Not a valid openid identifier. Examin your spelling and try again';
-        return;
-    }
+            //     openid_redirect($openid_endpoint, $authn_request);
+            echo "Redirect: $openid_endpoint";
+            $this->redirect_http($openid_endpoint, $authn_request);
+        } else {
+        //     openid_redirect_http($openid_endpoint, $authn_request);
+            echo "Redirect: $openid_endpoint";
+        }
+        $services = openid_descovery($claimed_id);
+        if (count($services) == 0) {
+            echo 'Not a valid openid identifier. Examin your spelling and try again';
+            return;
+        }
 
-    echo "Store in session\r\n";
-    // Store discovered information in Session
-    $_SESSION['openid']['service'] = $services[0];
-    $_SESSION['openid']['claimed_id'] = $claimed_id;
-    $_SESSION['openid']['user_login_values'] = $form_values;
+        echo "Store in session\r\n";
+        // Store discovered information in Session
+        $_SESSION['openid']['service'] = $services[0];
+        $_SESSION['openid']['claimed_id'] = $claimed_id;
+        $_SESSION['openid']['user_login_values'] = $form_values;
 
-    $openid_endpoint = $services[0]['uri'];
-    $assoc_handle = openid_association($openid_endpoint);
+        $openid_endpoint = $services[0]['uri'];
+        $assoc_handle = openid_association($openid_endpoint);
 
-    // Time to acctualy request authentication
-    // First LocalID, Delegate othervise fallback on $claimed_id.
-    if (!empty($services[0]['localid'])) {
-        $identity = $services[0]['localid'];
-    } else if (!empty($services[0]['delegate'])) {
-        $identity = $services[0]['delegate'];
-    } else {
-        $identity = $claimed_id;
-    }
+        // Time to acctualy request authentication
+        // First LocalID, Delegate othervise fallback on $claimed_id.
+        if (!empty($services[0]['localid'])) {
+            $identity = $services[0]['localid'];
+        } else if (!empty($services[0]['delegate'])) {
+            $identity = $services[0]['delegate'];
+        } else {
+            $identity = $claimed_id;
+        }
 
-    if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
-        $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
-    }
-    $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
+        if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
+            $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
+        }
+        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
 
-    if ($services[0]['version'] == 2) {
-   //     openid_redirect($openid_endpoint, $authn_request);
-        echo "Redirect: $openid_endpoint";
-        $this->redirect_http($openid_endpoint, $authn_request);
-    } else {
-   //     openid_redirect_http($openid_endpoint, $authn_request);
-        echo "Redirect: $openid_endpoint";
-    }
-
+        if ($services[0]['version'] == 2) {
+       //     openid_redirect($openid_endpoint, $authn_request);
+            echo "Redirect: $openid_endpoint";
+            $this->redirect_http($openid_endpoint, $authn_request);
+        } else {
+       //     openid_redirect_http($openid_endpoint, $authn_request);
+            echo "Redirect: $openid_endpoint";
+        }
     }
 
 
@@ -683,10 +682,12 @@ function authentication_request($claimed_id, $identity, $return_to = '', $assoc_
   );
 
   if ($version == 2) {
-    $request['openid.realm'] = "http://local.openid_rely"; //url('', array('absolute' => TRUE));
+      // TODO config
+    $request['openid.realm'] = "http://local.trendycasino"; //url('', array('absolute' => TRUE));
   }
   else {
-    $request['openid.trust_root'] = "http://local.openid_rely"; // url('', array('absolute' => TRUE));
+      // TODO Config
+    $request['openid.trust_root'] = "http://local.trendycasino"; // url('', array('absolute' => TRUE));
   }
 
   // Simple Registration

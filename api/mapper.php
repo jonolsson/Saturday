@@ -160,6 +160,10 @@ protected static $DB;
   
     protected function load( $result ) {
         $array = $result->fetch(PDO::FETCH_ASSOC);
+        if (empty($array)) {
+            return null;
+        }
+
         // Create object
         $class = $this->model_prefix."_".$this->class;
         $obj = new $class();
