@@ -3,6 +3,7 @@
 class api_controller {
     
     public $view = null;
+
     public $layout = null;
 
     protected $params = null;
@@ -13,11 +14,16 @@ class api_controller {
 
     protected $response = null;
 
+    protected $config = null;
+
     function __construct($route, $request, $response) {
+        $cfg = api_config::getInstance();
+        $this->config = $cfg;
         $this->params = $route;
         $this->request = $request;
         $this->response = $response;
-        $this->logger = Zend_Log::factory(array(array('writerName' => 'Stream', 'writerParams' => array('stream' => PROJECT_DIR.'logs/development.log'))));
+        $writerConfig = $cfg->log;
+        $this->logger = Zend_Log::factory(array($writerConfig));
     }
 
     function setView($view) {

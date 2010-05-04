@@ -134,7 +134,7 @@ class api_frontcontroller {
     private function catchFinalException(Exception $e) {
         //api_exceptionhandler::handle($e, $this);
         $params = new api_params($this->route);
-        api_exceptionhandler::handle($e, new controllers_error($params, $this->request));
+        api_exceptionhandler::handle($e, new controllers_error($params, $this->request, $this->response));
         if ($this->response === null) {
             die();
         }

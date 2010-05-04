@@ -34,13 +34,13 @@ class api_pam {
             $username = $this->request->getParam('username');
             $password = $this->request->getParam('password');
         }
-print_r($username);
+//print_r($username);
         if (!empty($username)) {
             if ($this->checkAuth()) {
                 $this->logout();
             }
             $crudColumns = $this->getConfiguredColumns();
-print_r($crudColumns);
+//print_r($crudColumns);
             // $hash = $this->getOpt('hash');
             //$sql = 'SELECT SUBSTR('.$crudColumns['password'].',1,'.(int)$hash['saltLength'].')
             //    FROM '.$this->config->crud['crudTable'].'
@@ -59,29 +59,29 @@ print_r($crudColumns);
             }
             $select = implode(' ,',$select);
             $sql = 'SELECT '.$select.' FROM '.$this->config->pam['table'].' WHERE '.$crudColumns['username'].' = :username';
-echo $sql;
+//echo $sql;
             $stmt = $this->db->prepare($sql);
 
             $sqlParams = array(
                 'username' => $username
             );
             $stmt->execute($sqlParams);
-echo "Here";
-print_r($sqlParams);
+//echo "Here";
+//print_r($sqlParams);
             $userData = $stmt->fetch(PDO::FETCH_ASSOC);
-print_r($userData);
+//print_r($userData);
             // Check password
             if (empty($userData)) {
             //    api_log::log(api_log::INFO, 'Credentials not correct');
             //    echo "Credential not correct";
             } else if (!$this->checkPassword($password, $userData['password'])) {
-                echo "Passwords wrong";
+  //              echo "Passwords wrong";
             } else {
                 session_regenerate_id(true);
                 unset($userData['password']);
-                echo "<br />";
-                print_r($this->config->appname);
-                echo "<br />";
+    //            echo "<br />";
+    //            print_r($this->config->appname);
+    //            echo "<br />";
                 //$_SESSION[$this->config->appname]['user'] = $userData;
                 api_session::set('user', $userData);
             }
