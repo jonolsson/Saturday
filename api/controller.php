@@ -11,9 +11,12 @@ class api_controller {
 
     protected $logger = null;
 
-    function __construct($route, $request) {
+    protected $response = null;
+
+    function __construct($route, $request, $response) {
         $this->params = $route;
         $this->request = $request;
+        $this->response = $response;
         $this->logger = Zend_Log::factory(array(array('writerName' => 'Stream', 'writerParams' => array('stream' => PROJECT_DIR.'logs/development.log'))));
     }
 

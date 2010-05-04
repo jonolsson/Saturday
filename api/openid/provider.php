@@ -18,14 +18,30 @@ define('OPENID_NS_1_1', 'http://openid.net/signon/1.1');
 define('OPENID_NS_1_0', 'http://openid.net/signon/1.0');
 
 
-class api_openid_provider {
+class api_openid_provider implements api_observable_interface {
+
+    private $observers = array();
+    function attach(api_observer_interface $observer) {
+        $this->observers[] = $observer;
+    }
+
+    function detach(api_observer_interface $observer) {
+        $this->observers = array_diff($this->observers, array($observer));
+    }
+
+    function notify() {
+        foreach($this->observers as $obs) {
+            $obs->update($this);
+        }
+    }
 
     function endpoint($request = array()) {
         if (count($request) == 0) {
             $request = $this->openid_response();
         }
         print_r($request);
-  
+        api_session::set('openid_request', $request);
+
         if (isset($request['openid.mode'])) {
             switch ($request['openid.mode']) {
                 case 'associate':
@@ -45,23 +61,21 @@ class api_openid_provider {
     function openid_response($str = NULL) {
         $data = array();
   
-  if (isset($_SERVER['REQUEST_METHOD'])) {
-    $data = $this->openid_get_params($_SERVER['QUERY_STRING']);
+        if (isset($_SERVER['REQUEST_METHOD'])) {
+            $data = $this->openid_get_params($_SERVER['QUERY_STRING']);
 
-    if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-      $str = file_get_contents('php://input');
+            if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+                $str = file_get_contents('php://input');
 
-      $post = array();
-      if ($str !== false) {
-        $post =  $this->openid_get_params($str);
-      }
-
-      $data = array_merge($data, $post);
+                $post = array();
+                if ($str !== false) {
+                    $post =  $this->openid_get_params($str);
+                }
+                $data = array_merge($data, $post);
+            }
+        }
+        return $data;
     }
-  }
-
-  return $data;
-}
 
 function openid_get_params($str) {
   $chunks = explode("&", $str);
@@ -140,7 +154,8 @@ function openid_provider_association_response($request) {
   //set_header('HTTP/1.1 200 OK');
   //set_header("Content-Type: text/plain");
  // TODO set header
-  print $message;
+  // print $message;
+  return $message;
 }
 
 function openid_provider_nonce() {
@@ -397,7 +412,9 @@ function openid_provider_authentication_response($request) {
   // If the user is not yet logged in, redirect to the login page before continuing.
   $user = api_session::get('user');
   if (!$user) {
-        $_SESSION['openid_provider']['request'] = $request;
+        //$_SESSION['openid_provider']['request'] = $request;
+      // Set in endpoint method
+      // api_session::set('openid_request', $request);
         $this->openid_redirect_http('/login');
   }
 
@@ -431,7 +448,7 @@ function openid_provider_authentication_response($request) {
     'openid.response_nonce' => $this->openid_provider_nonce(),
     'openid.assoc_handle' => $request['openid.assoc_handle'],
     'openid.sreg.nickname' => $user['username'], //name,
-    'openid.sreg.email' => "jon@studioett.com", //  TODO $user->mail
+    'openid.sreg.email' => $user['email'] //"jon@studioett.com", //  TODO $user->mail
   );
 
   // Is the RP requesting Immediate or Indirect mode?
