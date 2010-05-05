@@ -2,6 +2,8 @@
 
 class api_controller {
     
+    protected $filters = array();
+
     public $view = null;
 
     public $layout = null;
@@ -24,6 +26,10 @@ class api_controller {
         $this->response = $response;
         $writerConfig = $cfg->log;
         $this->logger = Zend_Log::factory(array($writerConfig));
+    }
+
+    function isAllowed($action) {
+        return true;
     }
 
     function setView($view) {

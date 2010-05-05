@@ -95,6 +95,9 @@ class api_frontcontroller {
             if (!method_exists($this->controller, $action)) {
                 throw new api_exception_NoActionFound("Action $action not found");
             }
+            if (!$this->controller->isAllowed($action)) {
+                throw new api_exception_NotAllowed("Access not Allowed");
+            }
             $this->controller->$action();
         //}// catch(Exception $e) {
          //   $this->catchException($e, array('command' => $this->route['command']));
