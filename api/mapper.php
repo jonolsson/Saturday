@@ -1,7 +1,7 @@
 <?php
 class api_mapper {
 
-protected static $DB;
+    protected static $DB;
     protected $name_opening;
     protected $name_closing;
     protected $primary_key = "id";
@@ -17,7 +17,7 @@ protected static $DB;
         if ( ! isset(self::$DB) ) {
       	    //self::$DB = new PDO('mysql:dbname=mapper;host=localhost', 'mapper', 'mapper' );
             //
-            self::$DB = database::factory();
+            self::$DB = api_database::factory();
             self::$DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$DB->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
         }
@@ -158,7 +158,7 @@ protected static $DB;
         return $this->db;
     }
   
-    protected function load( $result ) {
+    public function load( $result ) {
         $array = $result->fetch(PDO::FETCH_ASSOC);
         if (empty($array)) {
             return null;
@@ -174,7 +174,13 @@ protected static $DB;
         return $obj;
     }
   
-    protected function loadArray( $array ) {
+    public function loadArray( $array ) {
+        $class = $this->model_prefix."_".$this->class;
+        $obj = new $class();
+        foreach($this->table_meta as $key=>$value) {
+            $obj->$key = $array[$key];
+        }
+
         return $obj;
     }
   
@@ -207,7 +213,8 @@ protected static $DB;
 
     function findAll() {
         $result = $this->doStatement( $this->selectAllStmt, array() );
-        return $this->load( $result );
+        return new api_mapper_collection($result, $this);
+        //return $this->load( $result );
     }
 
     function delete($id) {
