@@ -26,7 +26,7 @@ class api_pam {
 
         $this->config = api_config::getInstance();
         $this->request = api_request::getInstance();
-        $this->db = database::factory();
+        $this->db = api_database::factory();
     }
 
     public function login($username, $password) {

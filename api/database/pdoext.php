@@ -23,7 +23,6 @@ class api_database_pdoext extends PDO {
     }
 
     public function query($statement) {
-        echo "Ext Query Jon";
         return parent::query($statement);
         //$this->log($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement));
     }

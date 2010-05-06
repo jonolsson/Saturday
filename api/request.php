@@ -224,6 +224,9 @@ class api_request {
     public function getParameters() {
         return $this->params;
     }
+    public function getParams() {
+        return $this->getParameters();
+    }
 
     /**
      * Returns the client IP address. In case of a clustered (load balancer)

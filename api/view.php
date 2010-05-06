@@ -118,7 +118,8 @@ class api_view {
     foreach ($this->outputFilters as $callback) {
       $str = call_user_func($callback, $str);
     }
-    echo $str;
+    //echo $str;
+    return $str;
   }
 
     // run view helpers
