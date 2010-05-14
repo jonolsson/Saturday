@@ -136,6 +136,13 @@ class api_request {
     }
 
     /**
+     * Return true if verb is post
+     */
+    public function isPost() {
+        return ($this->getVerb() == "POST");
+    }
+
+    /**
      * Returns the hostname of the current request.
      */
     public function getHost() {

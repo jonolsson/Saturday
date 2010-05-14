@@ -231,6 +231,11 @@ class api_mapper {
     /* 
      */
     function insert($obj)  {
+        $obj->validate();
+        $obj->insertValidate();
+        if ($this->hasErrors($obj)) {
+            return null;
+        }
         
         //echo "insert";
         // Build insert statement on the fly!
@@ -259,6 +264,11 @@ class api_mapper {
     }
 
   function update( $obj ) {
+        $obj->validate();
+        $obj->updateValidate();
+        if ($this->hasErrors($obj)) {
+            return null;
+        }
         foreach($this->table_meta_minus_pk as $key=>$value) {
             $values[] = $obj->$key;
         }
@@ -268,10 +278,13 @@ class api_mapper {
         unset( $values[$this->primary_key] );
         $values[$this->primary_key] = $id;
         $result = $this->doStatement( $this->updateStmt, array_values( $values ) );
+        return $result;
   }
 
-//    protected $db = null;
-//    function __construct() {
-//        $db = database::factory();
-//    }
+  function hasErrors($object) {
+      if (count($object->errors) > 0) {
+          return true;
+      }
+      return false;
+  }
 }

@@ -9,7 +9,7 @@ class api_view_helpers_textfieldfor {
         $html .= '<input type="text" id="field-' . e($field) . '" name="' . e($field) . '" value="' . e($entity->$field) . '" />';
 
         if (isset($entity->errors[$field])) {
-            $html .= '    <span style="display:block;color:red">' . escape($entity->errors[$field]) . ' </span>';
+            $html .= '    <span style="display:block;color:red">' . e($entity->errors[$field]) . ' </span>';
         }
         $html .= "\n";
         return $html;

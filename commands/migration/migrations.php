@@ -11,13 +11,20 @@ class commands_migration_Migrations {
      */
     private $db = null;
 
+    private $config = null;
+
     function __construct() {
         //$this->db = new Database("mysql:host=localhost;dbname=mapper", "mapper", "mapper");
-        echo "\nCalling dDatabase::factory()\n";
-        $this->db = Database::factory();
-        echo "\nIn commands_migration_Migrations - constructor\n";
+        echo "\nCalling api_database::factory()\n";
+        $this->db = api_database::factory();
+        echo "\nIn commands_migration_migrations - constructor\n";
         print_r( $this->db );
         $this->platform = "mysql";
+
+        // get database config
+        $this->config = api_config::getInstance()->database;
+        $this->config = $this->config['default'];
+        print_r($this->config);
     }
    
     /**
@@ -29,11 +36,17 @@ class commands_migration_Migrations {
         $default_limit = "";
         switch ( $type ) {
 
-			case DECIMAL: $default_limit = "(10,0)"; break;
-			case INTEGER: $default_limit = "(11)"; break;
-			case STRING:  $default_limit = "(255)"; break;
-			case BINARY:  $default_limit = "(1)"; break;
-			case BOOLEAN: $default_limit = "(1)"; break;
+			case 'decimal': $default_limit = "(10,0)"; break;
+            case 'integer': 
+                if ($this->config['driver'] == "postgres") {
+                    $default_limit = '';
+                } else {
+                    $default_limit = "(11)";
+                }
+                break;
+			case 'string':  $default_limit = "(255)"; break;
+			case 'binary':  $default_limit = "(1)"; break;
+			case 'boolean': $default_limit = "(1)"; break;
 			default: $default_limit = "";
 
 		}
@@ -47,13 +60,28 @@ class commands_migration_Migrations {
      * @param type
      */
     private function getDatatypes( $type ) {
+        print_r($this->config);
         $new_type = "";
         switch ( $type ) {
-            case INTEGER: $new_type = "INT"; break;
-            case STRING: $new_type = "VARCHAR"; break;
-            case BOOLEAN: $new_type = "TINYINT"; break;
+        case 'integer': 
+            if ($this->config['driver'] == 'postgres') {
+                $new_type = "integer";
+            } else {
+                $new_type = "INT";
+            } 
+            break;
+        
+        case 'string': $new_type = "VARCHAR"; break;
+        
+        case 'boolean': $new_type = "TINYINT"; break;
+        
+        case 'text': $new_type = "TEXT"; break;
         }
         return $new_type;
+    }
+
+    private function quote($name) {
+        return $this->db->quote($name);
     }
 
 // ------------------------------------------------------------------------
@@ -90,8 +118,8 @@ class commands_migration_Migrations {
  *		create_table (
  * 			'blog',
  * 			array (
- * 				'id' => array ( INTEGER ),
- * 				'title' => array ( STRING, LIMIT, 50, DEFAULT, "The blog's title." ),
+ * 				'id' => array ( 'integer' ),
+ * 				'title' => array ( 'string', LIMIT, 50, DEFAULT, "The blog's title." ),
  * 				'date' => DATE,
  * 				'content' => TEXT
  * 			),
@@ -110,7 +138,7 @@ class commands_migration_Migrations {
         switch ( $this->platform ) {
         case 'mysql':
             if ( !empty($primary_keys) ) $primary_keys = (array)$primary_keys;
-			$sql = "CREATE TABLE `{$table_name}` (";
+			$sql = "CREATE TABLE {$table_name} (";
 
 			foreach ( $fields as $field_name => $params ) {
 
@@ -122,11 +150,18 @@ class commands_migration_Migrations {
                 // Convert to mysql datatypes
                 $params[0] = $this->getDatatypes( $params[0] );
 
-                $sql .= "`{$field_name}` {$params[0]}";
-				$sql .= in_array(LIMIT,$params,true) ? "(" . $params[array_search(LIMIT,$params,true) + 1] . ") " : $default_limit . " ";
-				$sql .= in_array(DEFAULT_VALUE,$params,true) ? "default " . $CI->db->escape($params[array_search(DEFAULT_VALUE,$params,true) + 1]) . " " : "";
-				$sql .= in_array(NOT_NULL,$params,true) ? "NOT NULL " : "NULL ";
-				$sql .= in_array($field_name,$primary_keys,true) && $params[0] == INTEGER ? "auto_increment " : "";
+                $field_name = $field_name;
+                print_r($field_name);
+
+                if (in_array($field_name,$primary_keys,true) && $params[0] == 'integer') {
+                    $sql .= "{$field_name} ";
+                    $sql .=  "SERIAL ";
+                } else {
+                    $sql .= "{$field_name} {$params[0]}";
+				    $sql .= in_array('LIMIT',$params,true) ? "(" . $params[array_search('LIMIT',$params,true) + 1] . ") " : $default_limit . " ";
+				    $sql .= in_array('DEFAULT_VALUE',$params,true) ? "default " . $CI->db->escape($params[array_search('DEFAULT_VALUE',$params,true) + 1]) . " " : "";
+                    $sql .= in_array('NOT_NULL',$params,true) ? "NOT NULL " : "";
+                }
 				$sql .= ",";
 
 			}
@@ -138,7 +173,7 @@ class commands_migration_Migrations {
 				$sql .= ",PRIMARY KEY (";
 
 				foreach ( $primary_keys as $pk ) {
-					$sql .= "`{$pk}`,";
+					$sql .= "{$pk},";
 				}
 
 				$sql = rtrim($sql,',');
@@ -147,6 +182,9 @@ class commands_migration_Migrations {
 			}
 
 			$sql .= ")";
+
+            // use InnoDB as default
+            //$sql .= ' ENGINE=InnoDB';
 
 		break;
     }
@@ -159,6 +197,7 @@ class commands_migration_Migrations {
     
     $result = $this->db->query( $sql );
     print_r( $result );
+    print_r($this->db->errorInfo());
 }
     
 // ----------------------------------------------------------------
@@ -207,7 +246,7 @@ protected function drop_table($table_name) {
     /**
     * Add a column to a table
     *
-    * @example add_column ( "the_table", "the_field", STRING, array(LIMIT, 25, NOT_NULL) );
+    * @example add_column ( "the_table", "the_field", 'string', array(LIMIT, 25, NOT_NULL) );
     * @access public
     * @param string $table_name
     * @param string $column_name
@@ -230,11 +269,11 @@ protected function drop_table($table_name) {
 
 			    switch ( $type ) {
 
-				    case DECIMAL: $default_limit = "(10,0)"; break;
-				    case INTEGER: $default_limit = "(11)"; break;
-				    case STRING:  $default_limit = "(255)"; break;
-				    case BINARY:  $default_limit = "(1)"; break;
-				    case BOOLEAN: $default_limit = "(1)"; break;
+				    case 'decimal': $default_limit = "(10,0)"; break;
+				    case 'integer': $default_limit = "(11)"; break;
+				    case 'string':  $default_limit = "(255)"; break;
+				    case 'binary':  $default_limit = "(1)"; break;
+				    case 'boolean': $default_limit = "(1)"; break;
 				    default: $default_limit = "";
 
 			    }

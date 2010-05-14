@@ -3,7 +3,7 @@
 //require '../database.php';
 //require 'migrations.php';
 
-class commands_Migration {
+class commands_migration {
 
     private $path = "db/migrations/";
 
@@ -17,7 +17,7 @@ class commands_Migration {
         foreach( $migrations as $migration ) {
             $name = basename( $migration );
             echo "Name: $name\n";
-            if ( preg_match('/^\d{3}_(.+)$/', $name, $match) ) {
+            if ( preg_match('/^\d{14}_(.+)$/', $name, $match) ) {
                 echo "Name: $name\n";
                 print_r( $match );
                 $class = basename( $match[1], ".php");
