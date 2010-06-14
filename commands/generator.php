@@ -46,8 +46,14 @@ class commands_generator {
             $this->generateMapper();
             break;
         case 'migration':
+            $column = explode('_', $this->console->argument(1));
+            $action = $column[0];
             echo "Generate migration\n";
-            $this->generateMigrationChange();
+            if ($action == "add") {
+                $this->generateMigrationChange();
+            } else {
+                $this->generateMigrationCreate();
+            }
             break;
         case 'scaffold':
             // generate.php scaffold realm name:string url:string blah:integer
@@ -62,6 +68,9 @@ class commands_generator {
     protected function generateMigrationCreate($fields=array()) {
         $migration = file_get_contents($this->template_dir.'migration_create.php');
         $table_name = $this->controller;
+        if (strstr($table_name, 'create_')) {
+            $table_name = str_replace('create_', '', $table_name);
+        }
         $migration = str_replace("name", $table_name, $migration);
 
         $field_string = '';
@@ -123,7 +132,7 @@ class commands_generator {
         }
         $down_field_string = rtrim($down_field_string);
         $migration = str_replace('down_fields', $down_field_string, $migration);
-        $filename = date("Ymdhis").'_create_'.$table_name.'.php';
+        $filename = date("Ymdhis").'_'.$table_name.'.php';
         echo $migration;
         echo "\n";
         file_put_contents($this->migration_path.$filename, $migration);

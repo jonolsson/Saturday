@@ -18,6 +18,10 @@ class api_controller {
 
     protected $config = null;
 
+    /* Event dispatcher */
+    protected $dispatcher = null; 
+
+
     function __construct($route, $request, $response) {
         $cfg = api_config::getInstance();
         $this->config = $cfg;
@@ -26,6 +30,11 @@ class api_controller {
         $this->response = $response;
         $writerConfig = $cfg->log;
         $this->logger = Zend_Log::factory(array($writerConfig));
+        $this->dispatcher = new sfEventDispatcher();
+        $this->init();
+    }
+
+    function init() {
     }
 
     function isAllowed($action) {

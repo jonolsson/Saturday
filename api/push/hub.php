@@ -154,11 +154,39 @@ class api_push_hub {
     return $result;
   }
 
+    function push($url, $content, $secret) {
+        $result = FALSE;
+        $params = array('http' =>
+                array(
+                  'method' => 'POST',
+                  'content' => $content,
+                  'header' => "Content-Type: application/atom+xml\n".
+                              "Content-Length: ". strlen($content) ."\n\n",
+                ),
+              );
+    if (!empty($secret)) {
+      $params['http']['header']['X-Hub-Signature'] = hash_hmac('sha1', $content, $secret);
+    }
+    $ctx = stream_context_create($params);
+    if ($fp = @fopen($url, 'rb', false, $ctx)) {
+      $response = @stream_get_contents($fp);
+      $meta = stream_get_meta_data($fp);
+      preg_match('/HTTP.*?\s(\d*?)\s.*/i', $meta['wrapper_data'][0], $matches);
+      $code = (integer) $matches[1];
+      if ($code >= 200 && $code < 300) {
+        $result = TRUE;
+      }
+      fclose($fp);
+    }
+    return $result;
+  }
+
+
   /**
    * Issue a light ping, not spec conform.
    */
-  protected function lightPing($url) {
-    $request = curl_init($url);
+  function lightPing($url, $challenge='') {
+    $request = curl_init($url."?hub_challenge=$challenge");
     curl_setopt($request, CURLOPT_FOLLOWLOCATION, TRUE);
     $data = curl_exec($request);
     $code = curl_getinfo($request, CURLINFO_HTTP_CODE);

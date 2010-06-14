@@ -54,7 +54,7 @@ class api_mapper {
 
             $this->selectStmt           = "SELECT * FROM ". $this->table." WHERE $this->primary_key=?";
             $this->selectAllStmt        = "SELECT * FROM $this->table";
-            $this->updateStmt           = $this->buildUpdateStmt(); 
+       //     $this->updateStmt           = $this->buildUpdateStmt(); 
             $this->insertStmt           = $this->buildInsertStmt(); 
             $this->deleteStmt           = "DELETE FROM $this->table WHERE id = ?";
 
@@ -68,8 +68,10 @@ class api_mapper {
         return $str . "=?";
     }
 
-    private function buildUpdateStmt() {
-        $columns = array_keys($this->table_meta_minus_pk);
+    private function buildUpdateStmt($columns=null) {
+        if(!$columns) {
+            $columns = array_keys($this->table_meta_minus_pk);
+        }
         $c = array_map( array("api_mapper", "prepareUpdate"), $columns );
         $stmt = "UPDATE $this->table SET ";
         $stmt .= implode( ",", $c );
@@ -267,11 +269,17 @@ class api_mapper {
         $obj->validate();
         $obj->updateValidate();
         if ($this->hasErrors($obj)) {
-            return null;
+            return false;
         }
+        $columns = array();
+        $values = array();
         foreach($this->table_meta_minus_pk as $key=>$value) {
-            $values[] = $obj->$key;
+            if ($obj->$key !== null) {
+                $columns[] = $key;
+                $values[] = $obj->$key;
+            }
         }
+        $this->updateStmt           = $this->buildUpdateStmt($columns);
         $pk = $this->primary_key;
         $id = $obj->$pk; //$this->primary_key;
         //echo "primary_key: ".$obj->id;

@@ -6,6 +6,7 @@ abstract class Mapper {
     protected $nameClosing;
     protected $primary_key = "id";
     protected $table;
+    protected $driver = '';
 
     private $tableMeta = array();
     private $metaMinusPK = array();
@@ -17,7 +18,8 @@ abstract class Mapper {
             self::$DB->setAttribute(PDO::ATTR_CASE, PDO::CASE_LOWER);
         
             $this->table = $table;
-        
+            $this->driver = api_config::getInstance()->database-Adefault->driver;
+
             switch (self::$DB->getAttribute(PDO::ATTR_DRIVER_NAME)) {
             case 'mysql':
                 $nameOpening = $nameClosing = '`';
@@ -36,6 +38,8 @@ abstract class Mapper {
             $this->tableMeta = $this->getTableMeta();
             $this->metaMinusPK = $this->tableMeta;
             unset( $this->metaMinusPK[$this->primary_key]);
+
+            print_r($this->metaMinusPK);
 
             $this->selectStmt           = "SELECT * FROM ". $this->table." WHERE $this->primary_key=?";
             $this->selectAllStmt        = "SELECT * FROM $this->table";
@@ -79,12 +83,19 @@ abstract class Mapper {
     }
 
     private function getTableMeta() {
-        $result = self::$DB->query("SHOW COLUMNS FROM ".$this->quoteName($this->table));
+
+        if ($this->driver == "postgres") {
+            $q = "SELECT column_name as field, data_type as type
+                    FROM information_schema.columns
+                    WHERE table_name = '".$this->table."'";
+        } else {         
+            $result = self::$DB->query("SHOW COLUMNS FROM ".$this->quoteName($this->table));
+        }
         $result->setFetchMode(PDO::FETCH_ASSOC);
         $meta = Array();
         foreach ($result as $row) {
             $meta[$row['field']] = Array(
-            'pk' => $row['key'] == 'PRI',
+            //'pk' => $row['key'] == 'PRI',
             'type' => $row['type'],
             );
         }

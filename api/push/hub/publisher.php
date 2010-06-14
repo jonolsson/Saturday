@@ -9,4 +9,8 @@ class api_push_hub_publisher {
     function publish($topic) {
         $this->publisher->save($topic);
     }
+
+    function notify($topic) {
+        $this->publisher->notify($topic);
+    }
 }

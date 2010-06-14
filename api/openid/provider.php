@@ -475,7 +475,9 @@ function openid_provider_authentication_response($request) {
     $this->openid_provider_rp_save($user['id'], $realm, TRUE);
   }
   $rp = $this->openid_provider_rp_load($user['id'], $realm);
+  echo "\nrp: "; 
   print_r($rp);
+  echo "\n";
   if ($rp) { //$rp->auto_release) {
     $response = $this->openid_provider_sign($response);
     //$this->openid_provider_rp_save($user['id'], $realm, TRUE);
@@ -495,7 +497,7 @@ function openid_provider_authentication_response($request) {
  * Check if realm is approved to authenticate for
  */
 function check_realm($realm) {
-      $db = Database::factory();
+      $db = api_database::factory();
       $stmt = $db->prepare("SELECT * FROM realms WHERE realm = ?");
       $stmt->execute(array($realm));
       $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -505,7 +507,7 @@ function check_realm($realm) {
 function openid_provider_rp_load($uuid, $realm = NULL) {
   if ($realm) {
     //return db_fetch_object(db_query("SELECT * FROM {openid_provider_relying_party} WHERE uid=%d AND realm='%s'", $uid, $realm));
-      $db = Database::factory();
+      $db = api_database::factory();
       $stmt = $db->prepare("SELECT * FROM relying_party WHERE uuid = ? AND realm = ?");
       $stmt->execute(array($uuid, $realm));
       echo $realm;
@@ -531,7 +533,7 @@ function openid_provider_rp_save($uuid, $realm, $auto_release = FALSE) {
   if ($rpid) {
     db_query("UPDATE {openid_provider_relying_party} SET auto_release=%d, last_time=%d WHERE rpid=%d", $auto_release, time(), $rpid);  
      */
-      $db = Database::factory();
+      $db = api_database::factory();
       $stmt = $db->prepare("SELECT * FROM relying_party WHERE uuid = ? AND realm = ?");
       $stmt->execute(array($uuid, $realm));
       $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -540,8 +542,9 @@ function openid_provider_rp_save($uuid, $realm, $auto_release = FALSE) {
         $db->exec("UPDATE relying_party SET auto_release=$auto_release, lasttime=".time()." where id = ".$result->id);
     } else {
         echo "insert";
+        $auto_release = true;
         $db->exec("insert into relying_party (uuid, realm, firsttime, lasttime, auto_release) VALUES ($uuid, '$realm', '".time()."', '".time()."', $auto_release)");
-
+        print_r( $db->errorInfo());
         //db_query("INSERT INTO {openid_provider_relying_party} (uid, realm, first_time, last_time, auto_release) VALUES (%d, '%s', %d, %d, %d)", $uid, $realm, time(), time(), $auto_release);
     }
 }
