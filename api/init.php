@@ -3,16 +3,18 @@
 class api_init {
     private static $initialized = false;
 
-    public static function start() {
+    public static function start($base_path=null) {
+        echo $base_path;
         if (self::$initialized) {
             return;
         }
         
         /* project root
            ********************/
-        define( 'PROJECT_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
-        define( 'API_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR);
-        define( 'APP_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'app');
+        //define( 'PROJECT_DIR', dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR);
+        define( 'PROJECT_DIR', $base_path);
+        define( 'API_DIR', PROJECT_DIR . 'inc'. DIRECTORY_SEPARATOR);
+        define( 'APP_DIR', PROJECT_DIR . 'app'. DIRECTORY_SEPARATOR);
         define( 'VENDOR_DIR', PROJECT_DIR.'vendor');
         define( 'SF_EVENT_DIR', VENDOR_DIR.DIRECTORY_SEPARATOR.'sfEvent'.DIRECTORY_SEPARATOR);
         define( 'LOCAL_API_DIR', PROJECT_DIR.'localinc'.DIRECTORY_SEPARATOR);
