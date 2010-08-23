@@ -6,6 +6,7 @@ define('PUSH_HUB_LEASE_SECONDS', 3600*48);
 
 class api_push_hub {
     protected $subscriptions;
+    protected $logger = null;
 
     public static function getInstance(api_push_hub_subscriptions_interface $subscriptions) {
         static $hub;
@@ -23,7 +24,10 @@ class api_push_hub {
    *   PuSHHubSubscriptionsInterface.
    */
   protected function __construct(api_push_hub_subscriptions_interface $subscriptions) {
-    $this->subscriptions = $subscriptions;
+
+        $cfg = api_config::getInstance();
+        $this->logger = Zend_Log::factory(array($cfg->log));
+        $this->subscriptions = $subscriptions;
   }
 
   /**
@@ -51,6 +55,7 @@ class api_push_hub {
    *   TRUE if subscriber was successfully notified, FALSE otherwise.
    */
   public function notify($topic, $subscriber, $changed = NULL) {
+      $this->logger->info("Notify");
     if ($changed === NULL) {
       return $this->lightPing($subscriber);
     }
@@ -91,8 +96,12 @@ class api_push_hub {
    */
   public function subscribe($post) {
       //error_log(
-      print_r($post);
-    if (isset($post['hub_topic']) && isset($post['hub_callback']) && $this->verify($post)) {
+      //print_r($post);
+      // Authenticate
+      $received_secret = $post['secret'];
+      $cfg = api_config::getInstance()->hub;
+      $secret = md5($cfg['secret'].$post['hub_callback']);
+      if (($secret == $received_secret) and (isset($post['hub_topic']) && isset($post['hub_callback']) && $this->verify($post))) {
       $this->subscriptions->save($post['hub_topic'], $post['hub_callback'], isset($post['secret']) ? $post['secret'] : '');
     //  header('HTTP/1.1 204 "No Content"', null, 204);
     //    exit(); */
@@ -156,6 +165,8 @@ class api_push_hub {
 
     function push($url, $content, $secret) {
         $result = FALSE;
+       // $content = urlencode($content);
+        $content = "data=".$content;
         $params = array('http' =>
                 array(
                   'method' => 'POST',
@@ -186,6 +197,7 @@ class api_push_hub {
    * Issue a light ping, not spec conform.
    */
   function lightPing($url, $challenge='') {
+      $this->logger->info("Light ping");
     $request = curl_init($url."?hub_challenge=$challenge");
     curl_setopt($request, CURLOPT_FOLLOWLOCATION, TRUE);
     $data = curl_exec($request);
