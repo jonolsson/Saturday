@@ -5,7 +5,7 @@
 
 // Should be singleton?
 
-class I18n {
+class api_i18n {
 	var $content;
 
     private $NO_ID = 1;
