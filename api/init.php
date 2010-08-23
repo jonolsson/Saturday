@@ -4,7 +4,6 @@ class api_init {
     private static $initialized = false;
 
     public static function start($base_path=null) {
-        echo $base_path;
         if (self::$initialized) {
             return;
         }

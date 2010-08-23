@@ -14,13 +14,14 @@ class api_view {
     function __construct($route, $file=null, $layout="main.php") {
         if ($file) {
             $this->_template = $file;
-            $this->_viewDir = PROJECT_DIR."app/views/";
+            $this->_viewDir = "app/views/";
         } else {
             $this->_template = (isset($route['view']['php'])?$route['view']['php']:$route['action'].".php");
-            $this->_viewDir = PROJECT_DIR."app/views/".$route['controller']."/";
+            //$this->_viewDir = PROJECT_DIR."app/views/".$route['controller']."/";
+            $this->_viewDir = "app/views/".$route['controller']."/";
         }
 
-        $this->_layoutDir = PROJECT_DIR."app/layouts/";
+        $this->_layoutDir = "app/layouts/";
         $this->_layout = (isset($route['layout']) ? $route['layout'] : $layout );
 
 //        $this->userViewHelperDir = PROJECT_DIR."app/views/".
@@ -71,11 +72,11 @@ class api_view {
         if (strstr($file, "_")) {
             $file = str_replace("_", "/", $file);
         }
-    $__template_filename__ = $file;        
+    $__template_filename__ = PROJECT_DIR.$file;        
     //$__template_filename__ = k_ClassLoader::SearchIncludePath(func_get_arg(0));
     if (!is_file($__template_filename__)) {
-        throw new api_exception_NoViewFound("View $file Not Found");
-      throw new Exception("View $file not found");
+        throw new api_exception_NoViewFound("View $__template_filename__ Not Found");
+        //throw new Exception("View $file not found");
     }
     $__old_handler_e__ = $GLOBALS['_global_function_callback_e'];
     $__old_handler_____ = $GLOBALS['_global_function_callback___'];
