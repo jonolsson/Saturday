@@ -16,7 +16,6 @@ class api_mapper {
     function __construct( $table ) {
         if ( ! isset(self::$DB) ) {
       	    //self::$DB = new PDO('mysql:dbname=mapper;host=localhost', 'mapper', 'mapper' );
-            //
             self::$DB = api_database::factory();
             self::$DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$DB->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
@@ -52,16 +51,16 @@ class api_mapper {
             $this->table_meta_minus_pk = $this->table_meta;
             unset( $this->table_meta_minus_pk[$this->primary_key]);
 
-            $this->selectStmt           = "SELECT * FROM ". $this->table." WHERE $this->primary_key=?";
-            $this->selectAllStmt        = "SELECT * FROM $this->table";
+        $this->selectStmt           = "SELECT * FROM ". $this->table." WHERE $this->primary_key=?";
+        $this->selectAllStmt        = "SELECT * FROM $this->table";
        //     $this->updateStmt           = $this->buildUpdateStmt(); 
-            $this->insertStmt           = $this->buildInsertStmt(); 
-            $this->deleteStmt           = "DELETE FROM $this->table WHERE id = ?";
+        $this->insertStmt           = $this->buildInsertStmt(); 
+        $this->deleteStmt           = "DELETE FROM $this->table WHERE id = ?";
 
-      // }
-            foreach($this->table_meta as $key => $value) {
-                $this->$key = '';
-            }
+    // }
+        foreach($this->table_meta as $key => $value) {
+            $this->$key = '';
+        }
     }
     
     static private function prepareUpdate( $str ) {
@@ -140,7 +139,7 @@ class api_mapper {
       Get id from last insert
     */
     protected function newId() {
-        return self::$DB->lastInsertId();
+        return self::$DB->lastInsertId($this->table.'_id_seq');
     }
 
     /**

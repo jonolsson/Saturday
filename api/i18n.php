@@ -35,7 +35,7 @@ class I18n {
 		if (isset($this->content[$name])) {
 			return $this->content[$name];
 		} else {
-			return "t {$name}";
+			return "str: {$name}";
 		}
 	}
 }
