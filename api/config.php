@@ -99,8 +99,8 @@ class api_config {
      * Constructor. Loads the configuration file into memory.
      */
     protected function __construct() {
-        if (isset($_SERVER['IBIS_ENV'])) {
-            $this->env = $_SERVER['IBIS_ENV'];
+        if (isset($_SERVER['SATURDAY_ENV'])) {
+            $this->env = $_SERVER['SATURDAY_ENV'];
         } else {
             $this->env = self::$DEFAULT_ENV;
         }
