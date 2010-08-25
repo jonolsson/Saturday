@@ -12,49 +12,62 @@ class commands_migration {
     }
 
     function migrate( $direction='up', $version=null ) {
+        // Get current version
+        $version = $this->getVersion();
+
+        // Get migrations
         $migrations = glob( $this->path."*.php");
-        print_r( $migrations );
+        //        print_r( $migrations );
+
+        try {
         foreach( $migrations as $migration ) {
             $name = basename( $migration );
-            echo "Name: $name\n";
+//            echo "Name: $name\n";
             if ( preg_match('/^\d{14}_(.+)$/', $name, $match) ) {
-                echo "Name: $name\n";
-                print_r( $match );
-                $class = basename( $match[1], ".php");
-                echo "\ninclude: ".$this->path.$name."\n";
-                include $this->path.$name;
-                echo "\nclass: $class\n"; 
+//                echo "Name: $name\n";
+                $stamp = explode('_', $name);
+                $stamp = $stamp[0];
+                if ($stamp > $version) {
+                    
+//                print_r( $match );
+                    $class = basename( $match[1], ".php");
+//                echo "\ninclude: ".$this->path.$name."\n";
+                    include $this->path.$name;
+//                echo "\nclass: $class\n"; 
                 // call_user_func(array($class, "up"));
         		//		$match[1] = strtolower($match[1]);
-                $mig = new $class();
-                $mig->$direction();
+                    try {
+                        $mig = new $class();
+                        $mig->$direction();
+                    }
+                    catch (Exception $e) {
+                        throw new Exception("Migration failed");    
+                    }
+                    $this->increaseVersion($stamp);
+                }
             }
         }
+        }
+        catch(Exception $e) {
+            echo "Migration failed\n";
+        }
+    }
+    
+    private function increaseVersion($version) {
+        $db = api_database::factory();
+        $stmt = $db->query("INSERT INTO schema_migrations (version) values ('$version')");
     }
 
-    function blah() {
-$migrations_path = "migrations/";
-
-$migrations = glob( $migrations_path."*.php");
-
-print_r( $migrations );
-$direction = "up";
-foreach( $migrations as $migration ) {
-    $name = basename( $migration );
-    echo $name;
-    if ( preg_match('/^\d{3}_(.+)$/', $name, $match) ) {
-        echo $name;
-        print_r( $match );
-        $class = basename( $match[1], ".php");
-        echo "\ninclude: ".$migrations_path.$name."\n";
-        include $migrations_path.$name;
-        echo "\nclass: $class\n"; 
-        // call_user_func(array($class, "up"));
-		//		$match[1] = strtolower($match[1]);
-        $mig = new $class();
-        $mig->$direction();
+    private function getVersion() {
+        $db = api_database::factory();
+        if ($stmt = $db->query("SELECT * FROM schema_migrations order by version DESC")) {
+            $v = $stmt->fetch(PDO::FETCH_ASSOC);
+        } else { 
+            $db->query("CREATE TABLE schema_migrations (version character(14))");
+            $v['version'] = 0;
+        }
+        return $v['version'];
     }
-}
-}
+
 }
 

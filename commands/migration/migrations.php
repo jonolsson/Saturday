@@ -15,16 +15,16 @@ class commands_migration_Migrations {
 
     function __construct() {
         //$this->db = new Database("mysql:host=localhost;dbname=mapper", "mapper", "mapper");
-        echo "\nCalling api_database::factory()\n";
+        //echo "\nCalling api_database::factory()\n";
         $this->db = api_database::factory();
-        echo "\nIn commands_migration_migrations - constructor\n";
-        print_r( $this->db );
+        //echo "\nIn commands_migration_migrations - constructor\n";
+        //print_r( $this->db );
         $this->platform = "mysql";
 
         // get database config
         $this->config = api_config::getInstance()->database;
         $this->config = $this->config['default'];
-        print_r($this->config);
+        //print_r($this->config);
     }
    
     /**
@@ -60,7 +60,7 @@ class commands_migration_Migrations {
      * @param type
      */
     private function getDatatypes( $type ) {
-        print_r($this->config);
+        //print_r($this->config);
         $new_type = "";
         switch ( $type ) {
         case 'integer': 
@@ -71,6 +71,14 @@ class commands_migration_Migrations {
             } 
             break;
         
+        case 'timestamp': 
+            if ($this->config['driver'] == 'postgres') {
+                $new_type = "timestamp without time zone";
+            } else {
+                $new_type = "datetime";
+            } 
+            break;
+
         case 'string': $new_type = "VARCHAR"; break;
         
         case 'boolean': $new_type = "TINYINT"; break;
@@ -133,7 +141,7 @@ class commands_migration_Migrations {
  * @return	boolean
  */ 
     protected function create_table( $table_name, $fields, $primary_keys = false ) {
-        echo "In create table!";
+        //echo "In create table!";
         //$platform = "mysql";
         switch ( $this->platform ) {
         case 'mysql':
@@ -151,7 +159,7 @@ class commands_migration_Migrations {
                 $params[0] = $this->getDatatypes( $params[0] );
 
                 $field_name = $field_name;
-                print_r($field_name);
+                //print_r($field_name);
 
                 if (in_array($field_name,$primary_keys,true) && $params[0] == 'integer') {
                     $sql .= "{$field_name} ";
@@ -190,14 +198,18 @@ class commands_migration_Migrations {
     }
 
     // Execute query
-    echo "\nSQL: "; 
-    echo $sql;
-    echo "\n";
-    print_r( $this->db );
+//    echo "\nSQL: "; 
+//    echo $sql;
+//    echo "\n";
+//    print_r( $this->db );
     
-    $result = $this->db->query( $sql );
-    print_r( $result );
-    print_r($this->db->errorInfo());
+    if ($result = $this->db->query( $sql )) {
+//        print_r( $result );
+    } else {
+//        echo "ErrorInfo";
+        $error = $this->db->errorInfo();
+        throw new Exception ($error[2]);
+    }
 }
     
 // ----------------------------------------------------------------
