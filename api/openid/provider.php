@@ -422,6 +422,7 @@ function openid_provider_authentication_response($request) {
   $realm = (empty($request['openid.realm'])) ? $request['openid.trust_root'] : $request['openid.realm'];
   // Check if realm is OK?
   if (!$this->check_realm($realm)) {
+      throw new Exception("Realm not ok");
       $this->openid_redirect_http('/error');
   }
 
