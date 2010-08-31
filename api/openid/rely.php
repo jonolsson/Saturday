@@ -60,7 +60,7 @@ class api_openid_rely {
         if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
             $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
         }
-        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
+        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version'], $values['realm']);
 
         if ($services[0]['version'] == 2) {
             //     openid_redirect($openid_endpoint, $authn_request);
@@ -98,7 +98,7 @@ class api_openid_rely {
         if (isset($services[0]['types']) && is_array($services[0]['types']) && in_array(OPENID_NS_2_0 .'/server', $services[0]['types'])) {
             $claimed_id = $identity = 'http://specs.openid.net/auth/2.0/identifier_select';
         }
-        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version']);
+        $authn_request = $this->authentication_request($claimed_id, $identity, $return_to, $assoc_handle, $services[0]['version'], $values['realm']);
 
         if ($services[0]['version'] == 2) {
        //     openid_redirect($openid_endpoint, $authn_request);
@@ -668,7 +668,7 @@ function create_message($data) {
   return $serialized;
 }
 
-function authentication_request($claimed_id, $identity, $return_to = '', $assoc_handle = '', $version = 2) {
+function authentication_request($claimed_id, $identity, $return_to = '', $assoc_handle = '', $version = 2, $realm='') {
 //  module_load_include('inc', 'openid');
 
   $ns = ($version == 2) ? OPENID_NS_2_0 : OPENID_NS_1_0;
@@ -683,11 +683,11 @@ function authentication_request($claimed_id, $identity, $return_to = '', $assoc_
 
   if ($version == 2) {
       // TODO config
-    $request['openid.realm'] = "http://local.trendycasino"; //url('', array('absolute' => TRUE));
+    $request['openid.realm'] = $realm; //"http://local.trendycasino"; //url('', array('absolute' => TRUE));
   }
   else {
       // TODO Config
-    $request['openid.trust_root'] = "http://local.trendycasino"; // url('', array('absolute' => TRUE));
+    $request['openid.trust_root'] = $realm; //"http://local.trendycasino"; // url('', array('absolute' => TRUE));
   }
 
   // Simple Registration
