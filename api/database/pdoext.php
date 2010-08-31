@@ -15,9 +15,9 @@ class api_database_pdoext extends PDO {
         } else if ($config['driver'] == "postgres") {
             $dsn = "pgsql:host=".$config['host'].";dbname=".$config['database'].";user=".$config['username'].";password=".$config['password'];
         }
-        $cfg = api_config::getInstance();
-        $writerConfig = $cfg->log;
-        $this->logger = Zend_Log::factory(array($writerConfig));
+ //       $cfg = api_config::getInstance();
+ //       $writerConfig = $cfg->log;
+ //       $this->logger = Zend_Log::factory(array($writerConfig));
         //$db = new PDO( $dsn, $config['username'], $config['password'] );
         parent::__construct($dsn, $config['username'], $config['password']);
     }
