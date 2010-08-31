@@ -28,7 +28,7 @@ class api_database_pdoext extends PDO {
     }
 
     public function query($statement) {
-        $this->logger->info($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement));
+        $this->logger->info($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement);
         return parent::query($statement);
         //$this->log($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement));
     }
