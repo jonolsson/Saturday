@@ -509,7 +509,7 @@ function openid_provider_rp_load($uuid, $realm = NULL) {
   if ($realm) {
     //return db_fetch_object(db_query("SELECT * FROM {openid_provider_relying_party} WHERE uid=%d AND realm='%s'", $uid, $realm));
       $db = api_database::factory();
-      $stmt = $db->prepare("SELECT * FROM relying_party WHERE uuid = ? AND realm = ?");
+      $stmt = $db->prepare("SELECT * FROM relying_parties WHERE uuid = ? AND realm = ?");
       $stmt->execute(array($uuid, $realm));
       echo $realm;
       $result = $stmt->fetch(PDO::FETCH_OBJ);
@@ -535,16 +535,16 @@ function openid_provider_rp_save($uuid, $realm, $auto_release = FALSE) {
     db_query("UPDATE {openid_provider_relying_party} SET auto_release=%d, last_time=%d WHERE rpid=%d", $auto_release, time(), $rpid);  
      */
       $db = api_database::factory();
-      $stmt = $db->prepare("SELECT * FROM relying_party WHERE uuid = ? AND realm = ?");
+      $stmt = $db->prepare("SELECT * FROM relying_partties WHERE uuid = ? AND realm = ?");
       $stmt->execute(array($uuid, $realm));
       $result = $stmt->fetch(PDO::FETCH_OBJ);
     if (!empty($result)) {
         echo "Update";
-        $db->exec("UPDATE relying_party SET auto_release=$auto_release, lasttime=".time()." where id = ".$result->id);
+        $db->exec("UPDATE relying_parties SET auto_release=$auto_release, lasttime=".time()." where id = ".$result->id);
     } else {
         echo "insert";
         $auto_release = true;
-        $db->exec("insert into relying_party (uuid, realm, firsttime, lasttime, auto_release) VALUES ($uuid, '$realm', '".time()."', '".time()."', $auto_release)");
+        $db->exec("insert into relying_parties (uuid, realm, firsttime, lasttime, auto_release) VALUES ($uuid, '$realm', '".time()."', '".time()."', $auto_release)");
         print_r( $db->errorInfo());
         //db_query("INSERT INTO {openid_provider_relying_party} (uid, realm, first_time, last_time, auto_release) VALUES (%d, '%s', %d, %d, %d)", $uid, $realm, time(), time(), $auto_release);
     }
