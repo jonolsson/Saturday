@@ -1,7 +1,7 @@
 <?php
 class api_session {
     private static $instance;
-
+    
     private function __construct() {
         session_start();
     }
@@ -23,5 +23,22 @@ class api_session {
 
     static function destroy($key) {
         unset($_SESSION[__CLASS__][$key]);
+    }
+
+    // Feedback string
+    static function add_flash($lvl, $message) {
+        if (!isset($_SESSION['flash'][$lvl])) {
+            $_SESSION['flash'][$lvl] = array();
+        }
+        array_push($_SESSION['flash'][$lvl], $message);
+    }
+
+    static function get_flash() {
+        if (isset($_SESSION['flash'])) {
+            $flash = $_SESSION['flash'];
+            $_SESSION['flash'] = '';
+            return $flash;
+        }
+        return array();
     }
 }
