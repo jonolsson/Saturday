@@ -54,7 +54,7 @@ class api_frontcontroller {
     }
 
     public function loadView() {
-        $this->view = (isset($this->route['view']) ? $this->route['view'] : $this->ctrl); // Or some default
+       # $this->view = (isset($this->route['view']) ? $this->route['view'] : $this->ctrl); // Or some default
         $view = new api_view($this->route);
         $this->controller->setView($view);
     }

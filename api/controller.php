@@ -45,6 +45,11 @@ class api_controller {
         $this->view = $view;
     }
 
+    function setViewScript($script) {
+        $view = new api_view($this->route, $script);
+        $this->setView($view); 
+    }
+
     function renderView() {
         return $this->view->render();
     }

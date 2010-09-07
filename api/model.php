@@ -1,12 +1,15 @@
 <?php
 class api_model {
-    public $created_at = "1977-09-19 12:12:12";
-    public $updated_at = "1977-09-19 12:12:12";
+    public $created_at = null; 
+    public $updated_at = null; 
     public $errors;
 
     protected $values = array();
 
     function __construct($params=null) {
+        $this->created_at = date("Y-m-d H:m:i"); 
+        $this->updated_at = date("Y-m-d H:m:i");
+
         $this->errors = new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
         if ($params) {
             foreach($params as $key=>$value) {

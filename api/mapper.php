@@ -4,6 +4,8 @@ class api_mapper {
     protected static $DB;
     protected $name_opening;
     protected $name_closing;
+    protected $column_opening = '';
+    protected $column_closing = '';
     protected $primary_key = "id";
     protected $table;
     protected $driver = null;
@@ -13,12 +15,17 @@ class api_mapper {
     private $table_meta = array();
     private $table_meta_minus_pk = array();
 
+    private static $logger;
+
     function __construct( $table ) {
         if ( ! isset(self::$DB) ) {
       	    //self::$DB = new PDO('mysql:dbname=mapper;host=localhost', 'mapper', 'mapper' );
             self::$DB = api_database::factory();
             self::$DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$DB->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
+
+            $cfg = api_config::getInstance();
+            self::$logger = Zend_Log::factory(array($cfg->log));
         }
         //echo "<br />self::DB => ";
         //$sth = self::$DB->exec("select * from user");
@@ -40,6 +47,7 @@ class api_mapper {
             case 'pgsql':
                 $this->name_opening = "'";
                 $this->name_closing = "'";
+                $this->column_opening = $this->column_closing = '"';
                 break;
 
             default:
@@ -79,15 +87,20 @@ class api_mapper {
     }
 
     private function buildInsertStmt() {
-        //echo "Build update statement\n";
+        //echo "Build update statement\n<br />";
         $columns = array_fill(0, count($this->table_meta_minus_pk), "?");
         $stmt = "INSERT INTO $this->table (";
+        //$cols = '';
+        /*foreach($this->table_meta_minus_pk as $key=>$value) {
+            $cols .= ", ".$this->quoteColumn($key);
+        }*/
         $stmt .= implode( ",", array_keys($this->table_meta_minus_pk) );
-        
+        //$stmt .= trim($cols, ' ,');
         $stmt .= ") VALUES (";
         $stmt .=implode(",", $columns); 
         $stmt .= ")";
         //echo $stmt;
+        //self::$logger->debug($stmt);
         return $stmt;
     }
   
@@ -95,6 +108,12 @@ class api_mapper {
         return $this->name_opening
             .str_replace($this->name_closing, $this->name_closing.$this->name_closing, $name)
             .$this->name_closing;
+         
+        // return $this->name_opening.$name.$this->name_closing;
+    }
+
+    private function quoteColumn($column) {
+        return $this->column_opening.$column.$this->column_closing;
     }
 
     private function get_table_meta() {
@@ -192,12 +211,12 @@ class api_mapper {
        // echo 'values: ';
        // print_r( $values );
        // echo "\n";
-    
         $stmt = self::$DB->prepare( $sth );
+        self::$logger->debug($stmt->queryString); 
         $stmt->execute( $values );
         if ( ! $stmt ) {
-            //echo self::$DB->ErrorMsg();
-            // throw exception TODO
+            echo self::$DB->ErrorMsg();
+             throw new Exception("Could not execute statement");
         }
         return $stmt;
     }

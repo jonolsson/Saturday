@@ -38,7 +38,7 @@ class api_view {
     * This function can be called from within a rendering template, with the shortcut function ``__``
     */
   function __($phrase) {
-        $i18n = new I18n();
+        $i18n = new api_i18n();
         $phrase = $i18n->translate($phrase);
         return $phrase;
   }
