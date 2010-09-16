@@ -19,8 +19,8 @@ class api_database_pdoext extends PDO {
  //       $writerConfig = $cfg->log;
  //       $this->logger = Zend_Log::factory(array($writerConfig));
         //$db = new PDO( $dsn, $config['username'], $config['password'] );
-            $cfg = api_config::getInstance();
-            $this->logger = Zend_Log::factory(array($cfg->log));
+            //$cfg = api_config::getInstance();
+            //$this->logger = Zend_Log::factory(array($cfg->log));
         parent::__construct($dsn, $config['username'], $config['password']);
     }
 
@@ -30,7 +30,7 @@ class api_database_pdoext extends PDO {
     }
 
     public function query($statement) {
-        $this->logger->info($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement);
+        api_log::log(api_log::INFO, $statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement);
         return parent::query($statement);
         //$this->log($statement instanceOf pdoext_Query ? $statement->toSql($this) : $statement));
     }

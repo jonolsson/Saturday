@@ -25,8 +25,7 @@ class api_push_hub {
    */
   protected function __construct(api_push_hub_subscriptions_interface $subscriptions) {
 
-        $cfg = api_config::getInstance();
-        $this->logger = Zend_Log::factory(array($cfg->log));
+        $this->logger = api_log::getInstance(); //Zend_Log::factory(array($cfg->log));
         $this->subscriptions = $subscriptions;
   }
 

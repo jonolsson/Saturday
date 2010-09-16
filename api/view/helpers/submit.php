@@ -11,7 +11,7 @@ class api_view_helpers_submit {
         $options['value'] = $value;
         foreach ($options as $k => $v) {
             if ($v != '') {
-                $html .= ' ' . e($k) . '="' . e($v) . '"';
+                $html .= ' ' . e($k) . '="' . e(t($v)) . '"';
             }
         }
         return $html . " />\n";

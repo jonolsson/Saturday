@@ -24,8 +24,7 @@ class api_mapper {
             self::$DB->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             self::$DB->setAttribute(PDO::ATTR_CASE, PDO::CASE_NATURAL);
 
-            $cfg = api_config::getInstance();
-            self::$logger = Zend_Log::factory(array($cfg->log));
+            self::$logger = api_log::getInstance();
         }
         //echo "<br />self::DB => ";
         //$sth = self::$DB->exec("select * from user");

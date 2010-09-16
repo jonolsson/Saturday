@@ -2,7 +2,7 @@
 class api_model {
     public $created_at = null; 
     public $updated_at = null; 
-    public $errors;
+    public $errors = null;
 
     protected $values = array();
 
@@ -41,4 +41,18 @@ class api_model {
      */
     function updateValidate() {}
 
+    function isValid() {
+        $this->validate();
+        if (count($this->errors) > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    /* fill model with request params */
+    function fill($request) {
+        foreach($request->getParams() as $field=>$value) {
+            $this->$field = $value;
+        }
+    }
 }

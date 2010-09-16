@@ -62,9 +62,11 @@ class commands_migration_Migrations {
     private function getDatatypes( $type ) {
         //print_r($this->config);
         $new_type = "";
+        $database = $this->config['driver'];
+
         switch ( $type ) {
         case 'integer': 
-            if ($this->config['driver'] == 'postgres') {
+            if ($database == 'postgres') {
                 $new_type = "integer";
             } else {
                 $new_type = "INT";
@@ -72,15 +74,20 @@ class commands_migration_Migrations {
             break;
         
         case 'timestamp': 
-            if ($this->config['driver'] == 'postgres') {
+            if ($database == 'postgres') {
                 $new_type = "timestamp without time zone";
             } else {
                 $new_type = "datetime";
             } 
             break;
 
-        case 'string': $new_type = "VARCHAR"; break;
-        
+        case 'string': 
+            if ($database == 'postgres') {
+                $new_type = "character varying";
+            } else {
+                $new_type = "VARCHAR";
+            }
+            break;
         case 'boolean': $new_type = "TINYINT"; break;
         
         case 'text': $new_type = "TEXT"; break;
@@ -267,7 +274,6 @@ protected function drop_table($table_name) {
     * @return boolean
     */
     protected function add_column($table_name,$column_name,$type,$arguments=array()) {
-
 	    //$CI =& _get_instance_w_dbutil();
 
 	    switch ( $this->platform ) {
@@ -275,10 +281,12 @@ protected function drop_table($table_name) {
 		    case 'mysql':
 		    default:
 
-			    $sql = "ALTER TABLE `{$table_name}` ADD `{$column_name}` {$type}";
+                $default_limit = $this->getDefaultLimit($type);
+                $type = $this->getDatatypes($type);
+			    $sql = "ALTER TABLE {$table_name} ADD {$column_name} {$type}";
 
 			    // Get the default Limit
-
+                /*
 			    switch ( $type ) {
 
 				    case 'decimal': $default_limit = "(10,0)"; break;
@@ -289,14 +297,14 @@ protected function drop_table($table_name) {
 				    default: $default_limit = "";
 
 			    }
-
-			    $sql .= in_array(LIMIT,$arguments,true) ? "(" . $arguments[array_search(LIMIT,$arguments,true) + 1] . ") " : $default_limit . " ";
-			    $sql .= in_array(DEFAULT_VALUE,$arguments,true) ? "default " . $CI->db->escape($arguments[array_search(DEFAULT_VALUE,$arguments,true) + 1]) . " " : "";
-			    $sql .= in_array(NOT_NULL,$arguments,true) ? "NOT NULL " : "NULL ";
+                 */
+			    $sql .= in_array('LIMIT',$arguments,true) ? "(" . $arguments[array_search(LIMIT,$arguments,true) + 1] . ") " : $default_limit . " ";
+			    $sql .= in_array('DEFAULT_VALUE',$arguments,true) ? "default " . $CI->db->escape($arguments[array_search(DEFAULT_VALUE,$arguments,true) + 1]) . " " : "";
+			    $sql .= in_array('NOT_NULL',$arguments,true) ? "NOT NULL " : "NULL ";
 			    break;
 
 	        }
-
+echo $sql."\n";
 	        return $this->db->query($sql);
 
         }

@@ -74,7 +74,7 @@ class api_config {
      * @return api_config an api_config instance;
      */
     public static function getInstance($forceReload = FALSE) {
-        if (! self::$instance instanceof Config || $forceReload) {
+        if (! self::$instance instanceof api_config || $forceReload) {
             self::$instance = new api_config();
         }
 

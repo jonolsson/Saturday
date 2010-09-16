@@ -17,7 +17,7 @@ class commands_migration {
 
         // Get migrations
         $migrations = glob( $this->path."*.php");
-        //        print_r( $migrations );
+                print_r( $migrations );
 
         try {
         foreach( $migrations as $migration ) {
@@ -27,6 +27,8 @@ class commands_migration {
 //                echo "Name: $name\n";
                 $stamp = explode('_', $name);
                 $stamp = $stamp[0];
+                echo "stamp: ".$stamp."\n";
+                echo "version: ".$version."\n";
                 if ($stamp > $version) {
                     
 //                print_r( $match );

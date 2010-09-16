@@ -89,14 +89,18 @@ class commands_generator {
         file_put_contents($this->migration_path.$filename, $migration);
     }
 
+    /*
+     * usage generate migration add_column_to_table
+     */
     protected function generateMigrationChange() {
         $migration = file_get_contents($this->template_dir.'migration.php');
         $table_name = $this->controller;
-        $column = explode('_', $table_name);
-        $action = $column[0];
-        $column = $column[count($column)-1];
-        echo $column."\n";
-        echo $table_name."\n";
+        $parts = explode('_', $table_name);
+        $action = $parts[0];
+        $column = $parts[1];
+        $table = $parts[count($parts)-1];
+        echo "Column: ".$column."\n";
+        echo "Table name: ".$table."\n";
 
         $fields=array();
         for($i=2; $i < $this->console->countArguments(); $i++) {

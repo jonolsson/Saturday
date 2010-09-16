@@ -28,8 +28,9 @@ class api_controller {
         $this->params = $route;
         $this->request = $request;
         $this->response = $response;
-        $writerConfig = $cfg->log;
-        $this->logger = Zend_Log::factory(array($writerConfig));
+//        $writerConfig = $cfg->log;
+//        $this->logger = Zend_Log::factory(array($writerConfig));
+        $this->logger = api_log::getInstance();
         $this->dispatcher = new sfEventDispatcher();
         $this->init();
     }
