@@ -94,18 +94,19 @@ class api_push_hub {
    *   A valid PubSubHubbub subscription request.
    */
   public function subscribe($post) {
-      //error_log(
-      //print_r($post);
-      // Authenticate
-      $received_secret = $post['secret'];
-      $cfg = api_config::getInstance()->hub;
-      $secret = md5($cfg['secret'].$post['hub_callback']);
-      if (($secret == $received_secret) and (isset($post['hub_topic']) && isset($post['hub_callback']) && $this->verify($post))) {
-      $this->subscriptions->save($post['hub_topic'], $post['hub_callback'], isset($post['secret']) ? $post['secret'] : '');
-    //  header('HTTP/1.1 204 "No Content"', null, 204);
-    //    exit(); */
-      echo "Good";
-      return true;
+    //error_log(
+    //print_r($post);
+    // Authenticate
+    $received_secret = $post['secret'];
+    api_log::log('DEBUG', "Received secret: $received_secret");
+    $cfg = api_config::getInstance()->hub;
+    $secret = md5($cfg['secret'].$post['hub_callback']);
+    if (($secret == $received_secret) and (isset($post['hub_topic']) && isset($post['hub_callback']) && $this->verify($post))) {
+        $this->subscriptions->save($post['hub_topic'], $post['hub_callback'], isset($post['secret']) ? $post['secret'] : '');
+        //  header('HTTP/1.1 204 "No Content"', null, 204);
+        //    exit(); */
+        echo "Good";
+        return true;
     }
     echo "not found";
     return false;

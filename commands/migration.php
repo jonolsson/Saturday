@@ -52,6 +52,7 @@ class commands_migration {
         }
         catch(Exception $e) {
             echo "Migration failed\n";
+            print_r($e);
         }
     }
     
