@@ -60,6 +60,7 @@ class api_pam {
             $select = implode(' ,',$select);
             $sql = 'SELECT '.$select.' FROM '.$this->config->pam['table'].' WHERE '.$crudColumns['username'].' = :username';
 //echo $sql;
+            api_log::log(api_log::DEBUG, $sql);
             $stmt = $this->db->prepare($sql);
 
             $sqlParams = array(
@@ -72,9 +73,10 @@ class api_pam {
 //print_r($userData);
             // Check password
             if (empty($userData)) {
-            //    api_log::log(api_log::INFO, 'Credentials not correct');
+                api_log::log(api_log::INFO, 'Credentials not correct');
             //    echo "Credential not correct";
             } else if (!$this->checkPassword($password, $userData['password'])) {
+                api_log::log(api_log::INFO, 'Password not correct');
   //              echo "Passwords wrong";
             } else {
                 session_regenerate_id(true);
@@ -83,6 +85,7 @@ class api_pam {
     //            print_r($this->config->appname);
     //            echo "<br />";
                 //$_SESSION[$this->config->appname]['user'] = $userData;
+                api_log::log(api_log::INFO, 'Login Successful creating user session');
                 api_session::set('user', $userData);
             }
         }
